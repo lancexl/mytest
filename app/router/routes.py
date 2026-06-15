@@ -70,7 +70,8 @@ def setup_page_routes(app: FastAPI) -> None:
     @app.get("/", response_class=HTMLResponse)
     async def auth_page(request: Request):
         """认证页面"""
-        return templates.TemplateResponse("auth.html", {"request": request})
+        # 修正：将 request 作为第一个参数
+        return templates.TemplateResponse(request, "auth.html", {"request": request})
 
     @app.post("/auth")
     async def authenticate(request: Request):
@@ -120,7 +121,9 @@ def setup_page_routes(app: FastAPI) -> None:
             logger.info(f"API stats retrieved: {api_stats}")
 
             logger.info(f"Keys status retrieved successfully. Total keys: {total_keys}")
+            # 修正：将 request 作为第一个参数
             return templates.TemplateResponse(
+                request,
                 "keys_status.html",
                 {
                     "request": request,
@@ -136,7 +139,9 @@ def setup_page_routes(app: FastAPI) -> None:
             logger.error(f"Error retrieving keys status or API stats: {str(e)}")
             # Even if there's an error, render the page with whatever data is available
             # or with empty/default values, so the frontend can still load.
+            # 修正：将 request 作为第一个参数
             return templates.TemplateResponse(
+                request,
                 "keys_status.html",
                 {
                     "request": request,
@@ -164,8 +169,9 @@ def setup_page_routes(app: FastAPI) -> None:
                 return RedirectResponse(url="/", status_code=302)
 
             logger.info("Config page accessed successfully")
+            # 修正：将 request 作为第一个参数
             return templates.TemplateResponse(
-                "config_editor.html", {"request": request}
+                request, "config_editor.html", {"request": request}
             )
         except Exception as e:
             logger.error(f"Error accessing config page: {str(e)}")
@@ -181,7 +187,10 @@ def setup_page_routes(app: FastAPI) -> None:
                 return RedirectResponse(url="/", status_code=302)
 
             logger.info("Logs page accessed successfully")
-            return templates.TemplateResponse("error_logs.html", {"request": request})
+            # 修正：将 request 作为第一个参数
+            return templates.TemplateResponse(
+                request, "error_logs.html", {"request": request}
+            )
         except Exception as e:
             logger.error(f"Error accessing logs page: {str(e)}")
             raise
